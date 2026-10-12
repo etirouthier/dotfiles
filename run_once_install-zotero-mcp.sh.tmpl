@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+if ! command -v uv &> /dev/null; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+uv tool install zotero-mcp-server
+
+if command -v claude &> /dev/null; then
+    claude mcp remove zotero --scope user 2>/dev/null || true
+    claude mcp add zotero --scope user \
+        -e ZOTERO_API_KEY="{{ .zoteroApiKey }}" \
+        -e ZOTERO_LIBRARY_ID="{{ .zoteroLibraryId }}" \
+        -- zotero-mcp
+fi
